@@ -7,6 +7,7 @@ import com.example.whiteboardsp19likithponnanna.model.Topic;
 import com.example.whiteboardsp19likithponnanna.model.User;
 import com.example.whiteboardsp19likithponnanna.model.Widget;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,7 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserService {
   private Widget startWidget  = new Widget((long)123, "HEADING", "1", "Doc obj model",
           "Heading Name","Paragraph text","Paragraph Name","UNORDERED","Nodes,Nodes1", "List Name",
@@ -48,8 +50,8 @@ public class UserService {
 
 
 
-  private User alice = new User((long) 123, "alice", "pass123", "Alice", "Wonderland", "FACULTY",courses);
-  private User bob = new User((long) 234, "bob", "pass245", "Bob", "Marley", "FACULTY", courses);
+  private User alice = new User((long) 123, "alice", "pass123", "Alice", "Wonderland", "FACULTY","def@gmail.com", "816225", courses);
+  private User bob = new User((long) 234, "bob", "pass245", "Bob", "Marley", "FACULTY","new@gmail.com", "123141", courses);
   private ArrayList <User> users = new ArrayList <>(Arrays.asList(alice, bob));
 
 
@@ -71,7 +73,7 @@ public class UserService {
 
 
   @PostMapping("/api/login")
-  public User login(	@RequestBody User credentials,
+  public User login(@RequestBody User credentials,
                       HttpSession session) {
     for (User user : users) {
       if( user.getUsername().equals(credentials.getUsername())
@@ -88,12 +90,6 @@ public class UserService {
           (HttpSession session) {
     session.invalidate();
   }
-
-
-
-
-
-
 
 
   @GetMapping("/api/users")

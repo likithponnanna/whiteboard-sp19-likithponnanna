@@ -9,6 +9,8 @@ public class User {
   private String firstName;
   private String lastName;
   private String role;
+  private  String email;
+  private String phoneNo;
   private List<Course> courses;
 
   public User() {
@@ -16,13 +18,15 @@ public class User {
   }
 
   public User(Long userId, String username, String password, String firstName, String lastName
-          , String role, List<Course> courses) {
+          , String role, String email, String phoneNo , List<Course> courses) {
     this.userId = userId;
     this.username = username;
     this.firstName = firstName;
     this.lastName = lastName;
     this.password = password;
     this.role = role;
+    this.email = email;
+    this.phoneNo = phoneNo;
     this.courses = courses;
   }
 
@@ -36,6 +40,22 @@ public class User {
             ", lastName='" + lastName + '\'' +
             ", role='" + role + '\'' +
             '}';
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+  public String getPhoneNo() {
+    return phoneNo;
+  }
+
+  public void setPhoneNo(String phoneNo) {
+    this.phoneNo = phoneNo;
   }
 
   public Long getUserId() {
