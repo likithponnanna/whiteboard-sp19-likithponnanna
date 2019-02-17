@@ -4,8 +4,8 @@ import com.example.whiteboardsp19likithponnanna.model.Course;
 import com.example.whiteboardsp19likithponnanna.model.Lesson;
 import com.example.whiteboardsp19likithponnanna.model.Module;
 import com.example.whiteboardsp19likithponnanna.model.Topic;
+import com.example.whiteboardsp19likithponnanna.model.User;
 import com.example.whiteboardsp19likithponnanna.model.Widget;
-import com.example.whiteboardsp19likithponnanna.services.UserService;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,90 +18,109 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders ="*")
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 public class CourseService {
 
-  private Widget startWidget  = new Widget((long)123, "HEADING", "1", "Doc obj model",
-          "Heading Name","Paragraph text","Paragraph Name","UNORDERED","Nodes,Nodes1", "List Name",
-          "https://picsum.photos/200", "Image Name", "Link Text",
-          "https://en.wikipedia.org/wiki/Document_Object_Model","Link Name");
-  private List<Widget> widgets = new ArrayList <>(Arrays.asList(startWidget));
 
-  private Topic startTopic = new Topic((long) 123,"Topic Title", widgets);
+  private static List<Course> courses;
 
-  private List<Topic> topics = new ArrayList <>(Arrays.asList(startTopic));
+  public CourseService(){
+    User alice = new User((long) 123, "alice", "pass123", "Alice", "Wonderland", "FACULTY", "def@gmail.com", "816225");
+    Course CS5400 = new Course((long)123, "CS-4500", alice, new ArrayList <>());
+    User bob = new User((long) 234, "bob", "pass245", "Bob", "Marley", "FACULTY", "new@gmail.com", "123141");
+    Course CS4500 = new Course((long)234, "CS-4500", bob, new ArrayList <>());
+    courses = new ArrayList <>();
+    courses.addAll(Arrays.asList(CS5400,CS4500));
 
-  private Lesson startLesson  = new Lesson((long) 123, "Lesson Title", topics);
-
-  private List<Lesson> lessons = new ArrayList <>(Arrays.asList(startLesson));
-
-  private Module startModule = new Module((long)123, "Module List", lessons );
-
-  private List<Module> modules = new ArrayList <>(Arrays.asList(startModule));
-
-  private Course startCourse = new Course((long) 123,"Course Test 1", modules);
-  private Course startCourse1 = new Course((long) 234,"Course Test 2", modules);
-
-  private List<Course> courses = new ArrayList <>(Arrays.asList(startCourse,startCourse1));
+  }
 
 
 
-  @GetMapping("/api/courses/{uid}")
-  public List<Course> findAllCourses(@PathVariable("uid") Long id) {
-    for (int i = 0; i < users ; i++) {
+  @GetMapping("/api/courses")
+  public List<Course> findAllCourses(HttpSession session) {
+    List<Course> courses = new ArrayList <>();
+    User loggedUser = (User) session.getAttribute("currentUser");
 
+    if(loggedUser !=null){
+      for (Course course: CourseService.courses){
+        if(course.getUser().getUserId().equals(loggedUser.getUserId())){
+          courses.add(course);
+        }
+      }
     }
+
     return courses;
   }
 
   @GetMapping("/api/courses/{cid}")
-  public Course findCourseById(@PathVariable("cid") Long id) {
-    for (int i = 0; i < courses.size(); i++) {
-      if (id.equals(courses.get(i).getId())) {
-        return courses.get(i);
+  public Course findCourseById(@PathVariable("cid") Long id, HttpSession session) {
+    User loggedUser = (User) session.getAttribute("currentUser");
+    if(loggedUser!=null) {
+      for (int i = 0; i < courses.size(); i++) {
+        if (courses.get(i).getId().equals(id) && courses.get(i).getUser().getUserId().equals(loggedUser.getUserId())) {
+
+          return courses.get(i);
+
+        }
       }
     }
-    return null;
+    return new Course();
   }
 
   @PostMapping("/api/courses")
-  public Course addCourse(@RequestBody Course course) {
-    courses.add(course);
-    return course;
+  public List<Course> createCourse(@RequestBody Course course, HttpSession session) {
+    System.out.println(course.getModules());
+    if(session.getAttribute("currentUser")!=null){
+      course.setUser((User) session.getAttribute("currentUser"));
+      course.setId(new Date().getTime());
+      if(course.getTitle().equals("")){
+        course.setTitle("New Course");
+      }
+      course.setModules(new ArrayList <>());
+      courses.add(course);
+
+    }
+    return courses;
+
   }
 
   @DeleteMapping("/api/courses/{cid}")
-  public void deleteCourse(@PathVariable("cid") Long id) {
-    for (int i = 0; i < courses.size(); i++) {
-      if (courses.get(i).getId().equals(id)) {
-        courses.remove(i);
+  public List<Course> deleteCourse(@PathVariable("cid") Long id, HttpSession session) {
+    User loggedUser = (User) session.getAttribute("currentUser");
+    if(loggedUser!=null) {
+      for (int i = 0; i < courses.size(); i++) {
+        if (courses.get(i).getId().equals(id)) {
+          courses.remove(i);
+          return courses;
+        }
       }
     }
+    return new ArrayList <>(Arrays.asList(new Course()));
   }
 
   @PutMapping("/api/courses/{cid}")
-  public Course updateCourse(@PathVariable("cid") Long id, @RequestBody Course course) {
-    for (int i = 0; i <= courses.size(); i++) {
-      if (courses.get(i).getId().equals(id)) {
-        if (course.getTitle() != null) {
-          courses.get(i).setTitle(course.getTitle());
-        }
-        if (course.getModules() != null) {
-          courses.get(i).setModules(course.getModules());
-        }
+  public Course updateCourse(@PathVariable("cid") Long id, @RequestBody Course course, HttpSession session) {
+    User loggedUser = (User) session.getAttribute("currentUser");
 
-        return courses.get(i);
+    if(loggedUser!=null) {
+      for (int i = 0; i < courses.size(); i++) {
+        if (courses.get(i).getId().equals(id) && courses.get(i).getUser().getUserId().equals(loggedUser.getUserId())) {
+         courses.set(i,course);
+
+          return courses.get(i);
+        }
       }
     }
-    return null;
+    return new Course();
   }
 
 
-
-  //private Course = new Course((long))
 
 
 }

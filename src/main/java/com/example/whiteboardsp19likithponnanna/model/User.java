@@ -11,14 +11,14 @@ public class User {
   private String role;
   private  String email;
   private String phoneNo;
-  private List<Course> courses;
+
 
   public User() {
 
   }
 
   public User(Long userId, String username, String password, String firstName, String lastName
-          , String role, String email, String phoneNo , List<Course> courses) {
+          , String role, String email, String phoneNo ) {
     this.userId = userId;
     this.username = username;
     this.firstName = firstName;
@@ -27,7 +27,7 @@ public class User {
     this.role = role;
     this.email = email;
     this.phoneNo = phoneNo;
-    this.courses = courses;
+
   }
 
   @Override
@@ -98,13 +98,7 @@ public class User {
     this.lastName = lastName;
   }
 
-  public List <Course> getCourses() {
-    return courses;
-  }
 
-  public void setCourses(List <Course> courses) {
-    this.courses = courses;
-  }
 
   public String getRole() {
     if (role == null) {
