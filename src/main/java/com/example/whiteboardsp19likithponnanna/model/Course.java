@@ -5,14 +5,16 @@ import java.util.List;
 public class Course {
 private Long  id;
 private  String title;
+private User user;
 private List<Module> modules;
 
   public Course() {
   }
 
-  public Course(Long id, String title, List<Module> modules){
+  public Course(Long id, String title, User user,  List<Module> modules){
     this.id = id;
     this.title = title;
+    this.user = user;
     this.modules = modules;
   }
 
@@ -34,6 +36,14 @@ private List<Module> modules;
 
   public List <Module> getModules() {
     return modules;
+  }
+
+  public User getUser() {
+    return user;
+  }
+
+  public void setUser(User user) {
+    this.user = user;
   }
 
   public void setModules(List <Module> modules) {

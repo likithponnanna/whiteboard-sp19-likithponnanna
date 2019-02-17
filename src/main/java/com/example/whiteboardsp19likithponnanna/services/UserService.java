@@ -23,36 +23,14 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
-public class UserService {
-  private Widget startWidget  = new Widget((long)123, "HEADING", "1", "Doc obj model",
-          "Heading Name","Paragraph text","Paragraph Name","UNORDERED","Nodes,Nodes1", "List Name",
-          "https://picsum.photos/200", "Image Name", "Link Text",
-          "https://en.wikipedia.org/wiki/Document_Object_Model","Link Name");
-  private List<Widget> widgets = new ArrayList <>(Arrays.asList(startWidget));
+@CrossOrigin(origins = "*", allowCredentials= "true", allowedHeaders ="*")
+public class UserService  {
 
-  private Topic startTopic = new Topic((long) 123,"Topic Title", widgets);
-
-  private List<Topic> topics = new ArrayList <>(Arrays.asList(startTopic));
-
-  private Lesson startLesson  = new Lesson((long) 123, "Lesson Title", topics);
-
-  private List<Lesson> lessons = new ArrayList <>(Arrays.asList(startLesson));
-
-  private Module startModule = new Module((long)123, "Module List", lessons );
-
-  private List<Module> modules = new ArrayList <>(Arrays.asList(startModule));
-
-  private Course startCourse = new Course((long) 123,"Course Test 1", modules);
-  private Course startCourse1 = new Course((long) 234,"Course Test 2", modules);
-
-  private List<Course> courses = new ArrayList <>(Arrays.asList(startCourse,startCourse1));
-
-
-
-  private User alice = new User((long) 123, "alice", "pass123", "Alice", "Wonderland", "FACULTY","def@gmail.com", "816225", courses);
-  private User bob = new User((long) 234, "bob", "pass245", "Bob", "Marley", "FACULTY","new@gmail.com", "123141", courses);
+  private User alice = new User((long) 123, "alice", "pass123", "Alice", "Wonderland", "FACULTY","def@gmail.com", "816225");
+  private User bob = new User((long) 234, "bob", "pass245", "Bob", "Marley", "FACULTY","new@gmail.com", "123141");
   protected ArrayList <User> users = new ArrayList <>(Arrays.asList(alice, bob));
+
+
 
 
   @PostMapping("/api/register")
@@ -82,7 +60,7 @@ public class UserService {
         return user;
       }
     }
-    return null;
+    return new User();
   }
 
   @PostMapping("/api/logout")
@@ -93,18 +71,18 @@ public class UserService {
 
 
   @GetMapping("/api/users")
-  public ArrayList <User> findAllUsers() {
+  public ArrayList <User> findAllUsers(HttpSession session) {
     return users;
   }
 
   @GetMapping("/api/users/{id}")
-  public User findUserById(@PathVariable("id") Long id) {
+  public User findUserById(@PathVariable("id") Long id,  HttpSession session) {
     for (int i = 0; i < users.size(); i++) {
       if (id.equals(users.get(i).getUserId())) {
         return users.get(i);
       }
     }
-    return null;
+    return new User();
   }
 
   @PostMapping("/api/users")
@@ -146,7 +124,7 @@ public class UserService {
         return users.get(i);
       }
     }
-    return null;
+    return new User();
   }
 
   @PostMapping("/api/user/search")

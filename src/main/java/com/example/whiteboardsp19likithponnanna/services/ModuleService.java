@@ -17,76 +17,105 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*", allowCredentials= "true", allowedHeaders ="*")
 public class ModuleService {
-
-  private Widget startWidget  = new Widget((long)123, "HEADING", "1", "Doc obj model",
-          "Heading Name","Paragraph text","Paragraph Name","UNORDERED","Nodes,Nodes1", "List Name",
-          "https://picsum.photos/200", "Image Name", "Link Text",
-          "https://en.wikipedia.org/wiki/Document_Object_Model","Link Name");
-  private List<Widget> widgets = new ArrayList<>(Arrays.asList(startWidget));
-
-  private Topic startTopic = new Topic((long) 123,"Topic Title", widgets);
-
-  private List<Topic> topics = new ArrayList <>(Arrays.asList(startTopic));
-
-  private Lesson startLesson  = new Lesson((long) 123, "Lesson Title", topics);
-
-  private List<Lesson> lessons = new ArrayList <>(Arrays.asList(startLesson));
-
-  private Module startModule = new Module((long)123, "Module List", lessons );
-
-  private List<Module> modules = new ArrayList <>(Arrays.asList(startModule));
+private CourseService courseService = new CourseService();
 
 
   @GetMapping("/api/course/{cid}/modules")
-  public List<Module> findAllModules(@PathVariable("cid") Long id) {
-    return modules;
+  public List<Module> findAllModules(@PathVariable("cid") Long id, HttpSession session) {
+    Course course = courseService.findCourseById(id,session);
+    if(course != null)
+    {
+      return course.getModules();
+    }
+    return new ArrayList <>(Arrays.asList(new Module()));
   }
 
   @GetMapping("/api/modules/{mid}")
-  public Module findModuleById(@PathVariable("mid") Long id) {
-    for (int i = 0; i < modules.size(); i++) {
-      if (id.equals(modules.get(i).getId())) {
-        return modules.get(i);
+  public Module findModuleById(@PathVariable("mid") Long id, HttpSession session) {
+    List<Course> courses =courseService.findAllCourses(session);
+    if(courses!=null){
+      for(Course course:courses){
+        List<Module> modules =  course.getModules();
+        for (Module module:modules){
+          if(module.getId().equals(id)){
+            return module;
+          }
+        }
       }
     }
-    return null;
+
+    return new Module();
   }
 
   @PostMapping("/api/courses/{cid}/modules")
-  public Module createModule(@PathVariable("cid") Long id, @RequestBody Module module) {
-    modules.add(module);
-    return module;
+  public List<Module> createModule(@PathVariable("cid") Long id,
+                             @RequestBody Module module, HttpSession session) {
+    Course course = courseService.findCourseById(id,session);
+
+    if(course!=null){
+      List<Module> modules =  course.getModules();
+      module.setId(new Date().getTime());
+      module.setLessons(new ArrayList <>());
+      modules.add(module);
+      course.setModules(modules);
+      return modules;
+    }
+
+    /*modules.add(module);
+    return module;*/
+    return new ArrayList <>(Arrays.asList(new Module()));
+
   }
 
   @DeleteMapping("/api/modules/{mid}")
-  public void deleteModule(@PathVariable("mid") Long id) {
-    for (int i = 0; i < modules.size(); i++) {
-      if (modules.get(i).getId().equals(id)) {
-        modules.remove(i);
+  public List<Module> deleteModule(@PathVariable("mid") Long id, HttpSession session) {
+    List<Course> courses = courseService.findAllCourses(session);
+    if(courses!=null) {
+      for (Course course:courses) {
+        List<Module> modules = course.getModules();
+        for (int i=0;i<modules.size();i++){
+          if(modules.get(i).getId().equals(id)){
+            modules.remove(i);
+            return modules;
+          }
+        }
+
+
       }
     }
+
+  return new ArrayList <>(Collections.singletonList(new Module())) ;
   }
 
   @PutMapping("/api/modules/{mid}")
-  public Module updateModule(@PathVariable("mid") Long id, @RequestBody Course course) {
-    for (int i = 0; i <= modules.size(); i++) {
-      if (modules.get(i).getId().equals(id)) {
-        if (course.getTitle() != null) {
-          modules.get(i).setTitle(course.getTitle());
-        }
-        /*if (course.getModules() != null) {
-          modules.get(i).setLessons(course.getModules());
-        }*/
+  public Module updateModule(@PathVariable("mid") Long id, @RequestBody Module module, HttpSession session) {
+    List<Course> courses = courseService.findAllCourses(session);
 
-        return modules.get(i);
+    for (Course course: courses) {
+      List<Module> modules = course.getModules();
+
+      for (int i = 0; i < modules.size(); i++) {
+        if (modules.get(i).getId().equals(id)){
+          module.setId(modules.get(i).getId());
+          module.setLessons(modules.get(i).getLessons());
+
+          modules.set(i, module);
+          return modules.get(i);
+        }
+
       }
+
     }
-    return null;
+    return new Module();
   }
 
 
