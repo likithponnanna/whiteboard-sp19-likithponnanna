@@ -5,6 +5,7 @@ import com.example.whiteboardsp19likithponnanna.model.Lesson;
 import com.example.whiteboardsp19likithponnanna.model.Module;
 import com.example.whiteboardsp19likithponnanna.model.Topic;
 import com.example.whiteboardsp19likithponnanna.model.Widget;
+import com.example.whiteboardsp19likithponnanna.services.UserService;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,8 +49,11 @@ public class CourseService {
 
 
 
-  @GetMapping("/api/courses")
-  public List<Course> findAllCourses() {
+  @GetMapping("/api/courses/{uid}")
+  public List<Course> findAllCourses(@PathVariable("uid") Long id) {
+    for (int i = 0; i < users ; i++) {
+
+    }
     return courses;
   }
 

@@ -52,7 +52,7 @@ public class UserService {
 
   private User alice = new User((long) 123, "alice", "pass123", "Alice", "Wonderland", "FACULTY","def@gmail.com", "816225", courses);
   private User bob = new User((long) 234, "bob", "pass245", "Bob", "Marley", "FACULTY","new@gmail.com", "123141", courses);
-  private ArrayList <User> users = new ArrayList <>(Arrays.asList(alice, bob));
+  protected ArrayList <User> users = new ArrayList <>(Arrays.asList(alice, bob));
 
 
   @PostMapping("/api/register")
